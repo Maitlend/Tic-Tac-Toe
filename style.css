@@ -1,0 +1,24 @@
+header {
+  margin-bottom: 25px;
+}
+
+.title {
+text-align: center;
+}
+
+.gameboard-container {
+  background-color: black;
+  display: grid;
+  grid-template-columns: minmax(100px,25vh) minmax(100px,25vh) minmax(100px,25vh);
+  gap: 1px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.cell {
+  aspect-ratio: 1;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

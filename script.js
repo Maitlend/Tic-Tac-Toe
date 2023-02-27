@@ -1,9 +1,9 @@
 const gameboard = (() => {
-  let _playerMoves = ["","","","","","","","",""];
+  const playerMoves = ["","","","","","","","",""];
 
   function playerMove(player, position){
     if(player === 'X' || player === 'O'){
-      _playerMoves[position] = player;
+      playerMoves[position] = player;
     }
     else{
       console.log("Invalid player picked to move...");
@@ -11,7 +11,7 @@ const gameboard = (() => {
   }
 
   function viewGameboard(){
-    console.log(_playerMoves);
+    console.log(playerMoves);
   }
 
   return {playerMove, viewGameboard};
@@ -23,18 +23,13 @@ const playerFactory = (name) => {
   function makeMove(position){
     gameboard.playerMove(name, position);
   }
-
-  if(name === 'X' || name === 'O'){
-    return {getName, makeMove}
-  }
-  else{
-    console.log(`ERROR: player name = ${name} but must be 'X' or 'O'`);
-  }
+  
+  return {getName, makeMove}
 }
 
-const displayController = (() => {
+// const displayController = (() => {
 
-})();
+// })();
 
 
 // Test gameboard functionality
@@ -56,7 +51,3 @@ console.log(playerX.getName());
 playerO.makeMove(0);
 playerX.makeMove(1);
 gameboard.viewGameboard();
-
-
-
-
