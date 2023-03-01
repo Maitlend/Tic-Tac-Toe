@@ -1,16 +1,15 @@
-const winConditions = [
-  ["0", "1", "2", "", "", "", "", "", ""],
-  ["", "", "", "3", "4", "5", "", "", ""],
-  ["", "", "", "", "", "", "6", "7", "8"],
-  ["0", "", "", "", "4", "", "", "", "8"],
-  ["", "", "2", "", "4", "", "6", "", ""],
-  ["0", "", "", "3", "", "", "6", "", ""],
-  ["", "1", "", "", "4", "", "", "7", ""],
-  ["", "", "2", "", "", "5", "", "", "8"],
-];
-
 const gameboard = (() => {
   const playerMoves = ["", "", "", "", "", "", "", "", ""];
+  const winConditions = [
+    ["0", "1", "2", "", "", "", "", "", ""],
+    ["", "", "", "3", "4", "5", "", "", ""],
+    ["", "", "", "", "", "", "6", "7", "8"],
+    ["0", "", "", "", "4", "", "", "", "8"],
+    ["", "", "2", "", "4", "", "6", "", ""],
+    ["0", "", "", "3", "", "", "6", "", ""],
+    ["", "1", "", "", "4", "", "", "7", ""],
+    ["", "", "2", "", "", "5", "", "", "8"],
+  ];
 
   function viewGameboard() {
     // console.log(playerMoves);
@@ -55,30 +54,18 @@ const gameboard = (() => {
 const playerFactory = (name) => {
   const getName = () => name;
 
-  function makeMove(position) {
-    gameboard.playerMove(name, position);
-  }
-
-  return { getName, makeMove };
+  return { getName };
 };
 
 const game = (() => {
-  const cells = [
-    document.getElementById("cell-0"),
-    document.getElementById("cell-1"),
-    document.getElementById("cell-2"),
-    document.getElementById("cell-3"),
-    document.getElementById("cell-4"),
-    document.getElementById("cell-5"),
-    document.getElementById("cell-6"),
-    document.getElementById("cell-7"),
-    document.getElementById("cell-8"),
-  ];
-
+  const cells = [];
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
-
   let currentPlayer = playerX;
+
+  for(let i = 0; i<=8; i+=1){
+    cells.push(document.getElementById(`cell-${i}`));
+  }
 
   function toggleTurn() {
     if (currentPlayer.getName() === "X") {
@@ -89,7 +76,6 @@ const game = (() => {
   }
 
   function cellClicked() {
-    // console.log(this);
     this.textContent = currentPlayer.getName();
     this.removeEventListener("click", cellClicked);
     const { id } = this;
@@ -103,35 +89,23 @@ const game = (() => {
     }
   }
 
-  function resetCellListeners(){
-    cells[0].addEventListener("click", cellClicked);
-    cells[1].addEventListener("click", cellClicked);
-    cells[2].addEventListener("click", cellClicked);
-    cells[3].addEventListener("click", cellClicked);
-    cells[4].addEventListener("click", cellClicked);
-    cells[5].addEventListener("click", cellClicked);
-    cells[6].addEventListener("click", cellClicked);
-    cells[7].addEventListener("click", cellClicked);
-    cells[8].addEventListener("click", cellClicked);
+  function resetCellListeners() {
+    cells.forEach(cell => cell.addEventListener("click", cellClicked));
   }
 
   function resetGame() {
     gameboard.resetPlayerMoves();
     cells.forEach((element, index) => {
-      cells[index].textContent = '';
+      cells[index].textContent = "";
     });
     resetCellListeners();
   }
 
-  cells[0].addEventListener("click", cellClicked);
-  cells[1].addEventListener("click", cellClicked);
-  cells[2].addEventListener("click", cellClicked);
-  cells[3].addEventListener("click", cellClicked);
-  cells[4].addEventListener("click", cellClicked);
-  cells[5].addEventListener("click", cellClicked);
-  cells[6].addEventListener("click", cellClicked);
-  cells[7].addEventListener("click", cellClicked);
-  cells[8].addEventListener("click", cellClicked);
+  function startGame() {
+    resetCellListeners();
+  }
 
-  return { resetGame, cellClicked };
+  return { startGame };
 })();
+
+game.startGame();
