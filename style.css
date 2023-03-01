@@ -22,3 +22,20 @@ text-align: center;
   justify-content: center;
   align-items: center;
 }
+
+footer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  bottom: 0px;
+  padding: 1.5rem;
+}
+
+.github-icon {
+  width: 5rem;
+}
+
+img {
+  max-width: 100%;
+}
