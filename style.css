@@ -1,15 +1,27 @@
+@font-face {
+  font-family: "Roboto";
+  src: url(Fonts/Roboto/Roboto-Light.ttf);
+}
+body {
+  font-family: "Roboto";
+}
+
 header {
-  margin-bottom: 25px;
+  margin: 25px 0px;
 }
 
 .title {
-text-align: center;
+  text-align: center;
+  font-size: 4rem;
 }
 
 .gameboard-container {
   background-color: black;
   display: grid;
-  grid-template-columns: minmax(100px,25vh) minmax(100px,25vh) minmax(100px,25vh);
+  grid-template-columns: minmax(100px, 20vh) minmax(100px, 20vh) minmax(
+      100px,
+      20vh
+    );
   gap: 1px;
   width: fit-content;
   margin: 0 auto;
@@ -29,13 +41,15 @@ footer {
   justify-content: center;
   position: absolute;
   bottom: 0px;
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .github-icon {
-  width: 5rem;
+  width: 4rem;
+  margin: 0px auto 0.5rem auto;
+  display: block;
 }
 
-img {
-  max-width: 100%;
+.github-icon img {
+  width: 100%;
 }
