@@ -1,5 +1,6 @@
+// Module for gameboard
 const gameboard = (() => {
-  const playerMoves = ["", "", "", "", "", "", "", "", ""];
+  let playerMoves = ["", "", "", "", "", "", "", "", ""];
   const winConditions = [
     ["0", "1", "2", "", "", "", "", "", ""],
     ["", "", "", "3", "4", "5", "", "", ""],
@@ -16,9 +17,7 @@ const gameboard = (() => {
   }
 
   function resetPlayerMoves() {
-    playerMoves.forEach((element, index) => {
-      playerMoves[index] = "";
-    });
+    playerMoves = ["", "", "", "", "", "", "", "", ""];
   }
 
   function currentPlayerIndexes(player) {
@@ -51,19 +50,21 @@ const gameboard = (() => {
   return { resetPlayerMoves, playerMove, viewGameboard };
 })();
 
+// Factory for creating players
 const playerFactory = (name) => {
   const getName = () => name;
 
   return { getName };
 };
 
+// Module for game
 const game = (() => {
   const cells = [];
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
 
-  for(let i = 0; i<=8; i+=1){
+  for (let i = 0; i <= 8; i += 1) {
     cells.push(document.getElementById(`cell-${i}`));
   }
 
@@ -77,10 +78,8 @@ const game = (() => {
 
   function cellClicked() {
     this.textContent = currentPlayer.getName();
-    this.removeEventListener("click", cellClicked);
     const { id } = this;
     const gameWon = gameboard.playerMove(currentPlayer, id.at(-1));
-    gameboard.viewGameboard();
     if (gameWon) {
       alert(`Congrats player ${currentPlayer.getName()}, you win!`);
       resetGame();
@@ -90,7 +89,7 @@ const game = (() => {
   }
 
   function resetCellListeners() {
-    cells.forEach(cell => cell.addEventListener("click", cellClicked));
+    cells.forEach((cell) => cell.addEventListener("click", cellClicked, {once : true}));
   }
 
   function resetGame() {
