@@ -18,16 +18,14 @@ header {
 .gameboard-container {
   background-color: black;
   display: grid;
-  grid-template-columns: minmax(100px, 20vh) minmax(100px, 20vh) minmax(
-      100px,
-      20vh
-    );
+  grid-template-columns: minmax(100px, 20vh) minmax(100px, 20vh) minmax(100px, 20vh);
   gap: 1px;
   width: fit-content;
   margin: 0 auto;
 }
 
 .cell {
+  position: relative;
   aspect-ratio: 1;
   background-color: white;
   display: flex;
@@ -35,6 +33,70 @@ header {
   align-items: center;
 }
 
+/* x marker start */
+#x1, #x2 {
+  position: absolute;
+  top: .75vh;
+  left: 0;
+  opacity: 0;
+  height: 20vh;
+  width: 20vh;
+  animation: .14s drawX linear;
+  animation-fill-mode: forwards;
+  /* z-index: 10; */
+}
+
+#x1 {
+  stroke-dasharray: 578;
+}
+
+#x2 {
+  stroke-dasharray: 615;
+  animation-delay: .18s;
+}
+
+@keyframes drawX {
+  0%{
+    opacity: 0;
+    stroke-dashoffset: 578;
+  }
+  1% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+/* X marker End */
+
+/* Circle Marke Start */
+#circle {
+  position: absolute;
+  top: 2vh;
+  left: 2vh;
+  opacity: 0;
+  height: 16vh;
+  width: 16vh;
+  animation: .25s drawO linear;
+  stroke-dasharray: 2311;
+  animation-fill-mode: forwards;
+}
+
+@keyframes drawO {
+  0%{
+    opacity: 0;
+    stroke-dashoffset: 2311;
+  }
+  1% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+/* Circle Marker End */
 footer {
   width: 100%;
   display: flex;
