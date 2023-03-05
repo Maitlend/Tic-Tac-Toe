@@ -35,12 +35,12 @@ header {
 
 /* x marker start */
 .x1, .x2 {
-  position: absolute;
-  top: .75vh;
-  left: 0;
   opacity: 0;
-  height: 20vh;
-  width: 20vh;
+  position: absolute;
+  top: 4%;
+  left: 0;
+  height: 100%;
+  width: 100%;
   animation: .14s drawX linear;
   animation-fill-mode: forwards;
 }
@@ -71,12 +71,12 @@ header {
 
 /* Circle Marker Start */
 .circle {
-  position: absolute;
-  top: 2vh;
-  left: 2vh;
   opacity: 0;
-  height: 16vh;
-  width: 16vh;
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  height: 80%;
+  width: 80%;
   animation: .25s drawO linear;
   stroke-dasharray: 2311;
   animation-fill-mode: forwards;
