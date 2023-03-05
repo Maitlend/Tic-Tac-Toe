@@ -34,7 +34,7 @@ header {
 }
 
 /* x marker start */
-#x1, #x2 {
+.x1, .x2 {
   position: absolute;
   top: .75vh;
   left: 0;
@@ -43,14 +43,13 @@ header {
   width: 20vh;
   animation: .14s drawX linear;
   animation-fill-mode: forwards;
-  /* z-index: 10; */
 }
 
-#x1 {
+.x1 {
   stroke-dasharray: 578;
 }
 
-#x2 {
+.x2 {
   stroke-dasharray: 615;
   animation-delay: .18s;
 }
@@ -71,7 +70,7 @@ header {
 /* X marker End */
 
 /* Circle Marker Start */
-#circle {
+.circle {
   position: absolute;
   top: 2vh;
   left: 2vh;

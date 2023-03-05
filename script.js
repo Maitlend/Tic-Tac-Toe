@@ -68,12 +68,12 @@ const xMarker = () => {
   const x2Path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
   xContainer.setAttribute("class", "x-mark");
-  x1.setAttribute("id", "x1");
+  x1.setAttribute("class", "x1");
   x1.setAttribute("viewBox", "0 0 807 743");
   x1.setAttribute("fill", "none");
   x1.setAttribute("stroke", "black");
 
-  x2.setAttribute("id", "x2");
+  x2.setAttribute("class", "x2");
   x2.setAttribute("viewBox", "0 0 807 743");
   x2.setAttribute("fill", "none");
   x2.setAttribute("stroke", "black");
@@ -108,7 +108,7 @@ const oMarker = () => {
     "path"
   );
 
-  circle.setAttribute("id", "circle");
+  circle.setAttribute("class", "circle");
   circle.setAttribute("viewBox", "0 0 760 680");
   circle.setAttribute("fill", "none");
   circle.setAttribute("stroke", "black");
@@ -146,18 +146,15 @@ const game = (() => {
   }
 
   function cellClicked() {
-    // this.textContent = currentPlayer.getName();
     // Create X or O and insert into cell
     const playerType = currentPlayer.getName();
     if(playerType === "X"){
       console.log("Player X");
       const x = xMarker();
-      // console.log(x.xContainer);
       this.appendChild(x.xContainer);
     }
     else{
       const o = oMarker();
-      // console.log("Player O");
       this.appendChild(o.oContainer);
     }
     const id = this.id.at(-1); 
