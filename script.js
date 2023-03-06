@@ -39,7 +39,7 @@ const gameboard = (() => {
         return "WIN";
       }
     }
-    if(playerMoves.includes("")){
+    if (playerMoves.includes("")) {
       return "NONE";
     }
     return "TIE";
@@ -60,7 +60,7 @@ const playerFactory = (name) => {
   return { getName };
 };
 
-const xMarker = () => {
+const xMarker = (winner) => {
   const xContainer = document.createElement("div");
   const x1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const x2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -68,12 +68,18 @@ const xMarker = () => {
   const x2Path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 
   xContainer.setAttribute("class", "x-mark");
-  x1.setAttribute("class", "x1");
+  if(!winner){
+    x1.setAttribute("class", "x1");
+    x2.setAttribute("class", "x2");
+  }
+  else{
+    xContainer.setAttribute("id", "x-winner");
+  }
+
   x1.setAttribute("viewBox", "0 0 807 743");
   x1.setAttribute("fill", "none");
   x1.setAttribute("stroke", "black");
 
-  x2.setAttribute("class", "x2");
   x2.setAttribute("viewBox", "0 0 807 743");
   x2.setAttribute("fill", "none");
   x2.setAttribute("stroke", "black");
@@ -84,7 +90,7 @@ const xMarker = () => {
   );
   x1Path.setAttribute("stroke-linecap", "round");
   x1Path.setAttribute("stroke-width", "50");
-  
+
   x2Path.setAttribute(
     "d",
     "M602.011 133.527C601.824 136.715 595.704 138.323 593.503 139.46C584.147 144.292 575.994 150.69 567.282 156.622C515.05 192.187 470.229 237.139 429.233 285.034C369.737 354.541 312.523 426.192 259.522 500.733C243.243 523.626 226.976 546.512 210.264 569.092C204.553 576.808 195.685 595.517 184.737 592.476"
@@ -96,11 +102,11 @@ const xMarker = () => {
   x2.appendChild(x2Path);
   xContainer.appendChild(x1);
   xContainer.appendChild(x2);
-  
-  return {xContainer};
+
+  return { xContainer };
 };
 
-const oMarker = () => {
+const oMarker = (winner) => {
   const oContainer = document.createElement("div");
   const circle = document.createElementNS("http://www.w3.org/2000/svg", "svg");
   const circlePath = document.createElementNS(
@@ -108,7 +114,14 @@ const oMarker = () => {
     "path"
   );
 
-  circle.setAttribute("class", "circle");
+  oContainer.setAttribute("class", "o-mark");
+  if(!winner){
+    circle.setAttribute("class", "circle");
+  }
+  else {
+    oContainer.setAttribute("id", "o-winner");
+  }
+
   circle.setAttribute("viewBox", "0 0 760 680");
   circle.setAttribute("fill", "none");
   circle.setAttribute("stroke", "black");
@@ -123,11 +136,15 @@ const oMarker = () => {
   circle.appendChild(circlePath);
   oContainer.appendChild(circle);
 
-  return {oContainer};
-}
+  return { oContainer };
+};
 
 // Module for game
 const game = (() => {
+  const modal = document.querySelector(".modal");
+  const resetGameBtn = document.getElementById("reset-game-btn");
+  const backdrop = document.querySelector(".backdrop");
+  const winnerDisplay = document.getElementById("winner-mark");
   const cells = [];
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
@@ -148,31 +165,34 @@ const game = (() => {
   function cellClicked() {
     // Create X or O and insert into cell
     const playerType = currentPlayer.getName();
-    if(playerType === "X"){
-      console.log("Player X");
+    if (playerType === "X") {
+      // console.log("Player X");
       const x = xMarker();
       this.appendChild(x.xContainer);
-    }
-    else{
+    } else {
       const o = oMarker();
       this.appendChild(o.oContainer);
     }
-    const id = this.id.at(-1); 
+    const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
-    // console.log(turnResult);
     if (turnResult === "WIN") {
-      alert(`Congrats player ${currentPlayer.getName()}, you win!`);
-      resetGame();
-    } else if(turnResult === "TIE"){
-      alert("Tie game, no winner!");  
-      resetGame();
+      const playerMark = currentPlayer.getName() === "X" ? xMarker("winner").xContainer : oMarker("winner").oContainer;
+      winnerDisplay.appendChild(playerMark);
+      modal.classList.add("open");
+      backdrop.classList.add("open");
+    } else if (turnResult === "TIE") {
+      winnerDisplay.textContent = "TIE"
+      modal.classList.add("open");
+      backdrop.classList.add("open");
     } else {
-        toggleTurn();
+      toggleTurn();
     }
   }
 
   function resetCellListeners() {
-    cells.forEach((cell) => cell.addEventListener("click", cellClicked, {once : true}));
+    cells.forEach((cell) =>
+      cell.addEventListener("click", cellClicked, { once: true })
+    );
   }
 
   function resetGame() {
@@ -182,6 +202,16 @@ const game = (() => {
     });
     resetCellListeners();
   }
+
+  function closeModal() {
+    backdrop.classList.remove("open");
+    modal.classList.remove("open");
+    winnerDisplay.textContent = "";
+    resetGame();
+  }
+
+  backdrop.addEventListener("click", closeModal);
+  resetGameBtn.addEventListener("click", closeModal);
 
   function startGame() {
     resetCellListeners();
