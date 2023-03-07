@@ -36,7 +36,8 @@ const gameboard = (() => {
     for (let i = 0; i < winConditions.length; i += 1) {
       const test = winConditions[i].every((val) => playerIndexes.includes(val));
       if (test) {
-        return "WIN";
+        // Win conditions met return winning squares
+        return winConditions[i];
       }
     }
     if (playerMoves.includes("")) {
@@ -66,13 +67,13 @@ const game = (() => {
   const resetGameBtn = document.getElementById("reset-game-btn");
   const backdrop = document.querySelector(".backdrop");
   const winnerDisplay = document.getElementById("winner-mark");
-  const cells = [];
+  const squares = [];
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
 
   for (let i = 0; i <= 8; i += 1) {
-    cells.push(document.getElementById(`cell-${i}`));
+    squares.push(document.getElementById(`cell-${i}`));
   }
 
   function toggleTurn() {
@@ -81,6 +82,17 @@ const game = (() => {
     } else {
       currentPlayer = playerX;
     }
+  }
+
+  function openModal() {
+    modal.classList.add("open");
+    backdrop.classList.add("open");
+  }
+
+  function highlightWinner(winningSquares){
+    winningSquares.forEach( (square) => {
+      squares[square].classList.add("winner");
+    });
   }
 
   function cellClicked() {
@@ -96,30 +108,30 @@ const game = (() => {
     }
     const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
-    if (turnResult === "WIN") {
+    console.log(turnResult);
+    if (Array.isArray(turnResult)) {
       const playerMark = currentPlayer.getName() === "X" ? xMarker("winner").xContainer : oMarker("winner").oContainer;
+      highlightWinner(turnResult);
       winnerDisplay.appendChild(playerMark);
-      modal.classList.add("open");
-      backdrop.classList.add("open");
+      openModal();
     } else if (turnResult === "TIE") {
       winnerDisplay.textContent = "TIE"
-      modal.classList.add("open");
-      backdrop.classList.add("open");
+      openModal();
     } else {
       toggleTurn();
     }
   }
 
   function resetCellListeners() {
-    cells.forEach((cell) =>
+    squares.forEach((cell) =>
       cell.addEventListener("click", cellClicked, { once: true })
     );
   }
 
   function resetGame() {
     gameboard.resetPlayerMoves();
-    cells.forEach((element, index) => {
-      cells[index].textContent = "";
+    squares.forEach((element, index) => {
+      squares[index].textContent = "";
     });
     resetCellListeners();
   }
@@ -128,6 +140,9 @@ const game = (() => {
     backdrop.classList.remove("open");
     modal.classList.remove("open");
     winnerDisplay.textContent = "";
+    squares.forEach(square => {
+      square.classList.remove("winner");
+    });
     resetGame();
   }
 
