@@ -95,20 +95,24 @@ const game = (() => {
     });
   }
 
+  function drawMark(square, mark){
+    square.appendChild(mark);
+  }
+
   function cellClicked() {
     // Create X or O and insert into cell
     const playerType = currentPlayer.getName();
     if (playerType === "X") {
       // console.log("Player X");
       const x = xMarker();
-      this.appendChild(x.xContainer);
+      drawMark(this, x.xContainer);
     } else {
       const o = oMarker();
-      this.appendChild(o.oContainer);
+      drawMark(this,o.oContainer);
     }
     const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
-    console.log(turnResult);
+    // console.log(turnResult);
     if (Array.isArray(turnResult)) {
       const playerMark = currentPlayer.getName() === "X" ? xMarker("winner").xContainer : oMarker("winner").oContainer;
       highlightWinner(turnResult);
