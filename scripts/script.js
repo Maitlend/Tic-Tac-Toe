@@ -52,6 +52,7 @@ const gameboard = (() => {
   }
 
   function isMovesLeft(board){
+    console.log(board);
     const foundEmpty = board.find(move => move === "");
     return foundEmpty !== undefined; 
   }
@@ -80,7 +81,7 @@ const gameboard = (() => {
       return score;
     }
 
-    if(!isMovesLeft()){
+    if(!isMovesLeft(board)){
       return 0;
     }
 
@@ -109,8 +110,27 @@ const gameboard = (() => {
     return bestVal;
   }
 
-  function getMove() {
-    return evaluate(playerMoves);
+  function findBestMove(board, player){
+    let bestVal = -1000;
+    let bestMove = -1;
+
+    for(let i = 0; i<board.length; i+=1){
+      if(board[i] === ""){
+         board[i] = player.getName();
+         const moveVal = minimax(board, 0, player, false);
+         board[i] = "";
+
+         if(moveVal > bestVal){
+            bestMove = i;
+            bestVal = moveVal;
+         }
+      }
+    }
+    return bestMove;
+  }
+
+  function getMove(dummyBoard, player) {
+    return findBestMove(dummyBoard, player);
   }
 
   return { resetPlayerMoves, playerMove, viewGameboard , getMove};
