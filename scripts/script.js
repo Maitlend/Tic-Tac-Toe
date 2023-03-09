@@ -51,6 +51,11 @@ const gameboard = (() => {
     return turnResult(player);
   }
 
+  function isMovesLeft(board){
+    const foundEmpty = board.find(move => move === "");
+    return foundEmpty !== undefined; 
+  }
+
   function evalutate(board){
     const xPositions = currentPlayerIndexes("X");
     const oPositions = currentPlayerIndexes("O");
