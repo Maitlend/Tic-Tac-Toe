@@ -56,7 +56,7 @@ const gameboard = (() => {
     return foundEmpty !== undefined; 
   }
 
-  function evalutate(board){
+  function evaluate(board){
     const xPositions = currentPlayerIndexes("X");
     const oPositions = currentPlayerIndexes("O");
 
@@ -73,8 +73,44 @@ const gameboard = (() => {
     return 0;
   }
 
+  function minimax(board, depth, player, isMaximizer) {
+    const score = evaluate(board);
+
+    if(score === 10 || score === -10){
+      return score;
+    }
+
+    if(!isMovesLeft()){
+      return 0;
+    }
+
+    // Check if player is Maximizer
+    if(isMaximizer){
+      let bestVal = -1000;
+      for(let i = 0; i<board.length; i+=1){
+        if(board[i] === ""){
+          board[i] = player.getName();
+          bestVal = Math.max(bestVal, minimax(board, depth+1, player, !isMaximizer));
+          board[i] = "";
+        }
+      }
+      return bestVal;
+    }
+    
+    // Player is minimizer
+    let bestVal = 1000;
+    for(let i = 0; i<board.length; i+=1){
+      if(board[i] === ""){
+        board[i] = player.getOpponent();
+        bestVal = Math.min(bestVal, minimax(board, depth+1, player, !isMaximizer));
+        board[i] = "";
+      }
+    }
+    return bestVal;
+  }
+
   function getMove() {
-    return evalutate(playerMoves);
+    return evaluate(playerMoves);
   }
 
   return { resetPlayerMoves, playerMove, viewGameboard , getMove};
@@ -83,8 +119,9 @@ const gameboard = (() => {
 // Factory for creating players
 const playerFactory = (name) => {
   const getName = () => name;
+  const getOpponent = () => name === "X" ? "O":"X";
 
-  return { getName };
+  return { getName, getOpponent };
 };
 
 // Module for game
