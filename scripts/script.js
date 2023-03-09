@@ -20,9 +20,9 @@ const gameboard = (() => {
     playerMoves = ["", "", "", "", "", "", "", "", ""];
   }
 
-  function currentPlayerIndexes(player) {
+  function currentPlayerIndexes(playerName) {
     const result = playerMoves.map((element, index) => {
-      if (element === player.getName()) {
+      if (element === playerName) {
         return index;
       }
       return -1;
@@ -31,7 +31,7 @@ const gameboard = (() => {
   }
 
   function turnResult(player) {
-    const playerIndexes = currentPlayerIndexes(player);
+    const playerIndexes = currentPlayerIndexes(player.getName());
 
     for (let i = 0; i < winConditions.length; i += 1) {
       const test = winConditions[i].every((val) => playerIndexes.includes(val));
@@ -51,7 +51,28 @@ const gameboard = (() => {
     return turnResult(player);
   }
 
-  return { resetPlayerMoves, playerMove, viewGameboard };
+  function evalutate(board){
+    const xPositions = currentPlayerIndexes("X");
+    const oPositions = currentPlayerIndexes("O");
+
+    for(let i=0; i<winConditions.length; i+=1){
+      const xWin = winConditions[i].every((val) => xPositions.includes(val));
+      const oWin = winConditions[i].every((val) => oPositions.includes(val));
+      if(xWin){
+        return 10;
+      }
+      if(oWin){
+        return -10;
+      }
+    }
+    return 0;
+  }
+
+  function getMove() {
+    return evalutate(playerMoves);
+  }
+
+  return { resetPlayerMoves, playerMove, viewGameboard , getMove};
 })();
 
 // Factory for creating players
