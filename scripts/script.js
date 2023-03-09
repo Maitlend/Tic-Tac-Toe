@@ -20,8 +20,8 @@ const gameboard = (() => {
     playerMoves = ["", "", "", "", "", "", "", "", ""];
   }
 
-  function currentPlayerIndexes(playerName) {
-    const result = playerMoves.map((element, index) => {
+  function currentPlayerIndexes(playerName, board) {
+    const result = board.map((element, index) => {
       if (element === playerName) {
         return index;
       }
@@ -31,7 +31,7 @@ const gameboard = (() => {
   }
 
   function turnResult(player) {
-    const playerIndexes = currentPlayerIndexes(player.getName());
+    const playerIndexes = currentPlayerIndexes(player.getName(), playerMoves);
 
     for (let i = 0; i < winConditions.length; i += 1) {
       const test = winConditions[i].every((val) => playerIndexes.includes(val));
@@ -51,23 +51,25 @@ const gameboard = (() => {
     return turnResult(player);
   }
 
-  function isMovesLeft(board){
-    console.log(board);
-    const foundEmpty = board.find(move => move === "");
-    return foundEmpty !== undefined; 
+  function isMovesLeft(board) {
+    const foundEmpty = board.find((move) => move === "");
+    return foundEmpty !== undefined;
   }
 
-  function evaluate(board){
-    const xPositions = currentPlayerIndexes("X");
-    const oPositions = currentPlayerIndexes("O");
+  function evaluate(board) {
+    const xPositions = currentPlayerIndexes("X", board);
+    const oPositions = currentPlayerIndexes("O", board);
+    // console.log(xPositions);
 
-    for(let i=0; i<winConditions.length; i+=1){
+    // console.log("Inside of evaluate(): ", board);
+    for (let i = 0; i < winConditions.length; i += 1) {
       const xWin = winConditions[i].every((val) => xPositions.includes(val));
       const oWin = winConditions[i].every((val) => oPositions.includes(val));
-      if(xWin){
+      // console.log("xWin: ", xWin, "oWin: ", oWin);
+      if (xWin) {
         return 10;
       }
-      if(oWin){
+      if (oWin) {
         return -10;
       }
     }
@@ -76,54 +78,65 @@ const gameboard = (() => {
 
   function minimax(board, depth, player, isMaximizer) {
     const score = evaluate(board);
+    // console.log("score = ", score);
 
-    if(score === 10 || score === -10){
+    if (score === 10 || score === -10) {
       return score;
     }
 
-    if(!isMovesLeft(board)){
+    if (!isMovesLeft(board)) {
       return 0;
     }
 
     // Check if player is Maximizer
-    if(isMaximizer){
+    if (isMaximizer) {
       let bestVal = -1000;
-      for(let i = 0; i<board.length; i+=1){
-        if(board[i] === ""){
+      for (let i = 0; i < board.length; i += 1) {
+        if (board[i] === "") {
           board[i] = player.getName();
-          bestVal = Math.max(bestVal, minimax(board, depth+1, player, !isMaximizer));
+          bestVal = Math.max(
+            bestVal,
+            minimax(board, depth + 1, player, !isMaximizer)
+          );
           board[i] = "";
         }
       }
       return bestVal;
     }
-    
+
     // Player is minimizer
     let bestVal = 1000;
-    for(let i = 0; i<board.length; i+=1){
-      if(board[i] === ""){
+    for (let i = 0; i < board.length; i += 1) {
+      if (board[i] === "") {
         board[i] = player.getOpponent();
-        bestVal = Math.min(bestVal, minimax(board, depth+1, player, !isMaximizer));
+        bestVal = Math.min(
+          bestVal,
+          minimax(board, depth + 1, player, !isMaximizer)
+        );
         board[i] = "";
       }
     }
     return bestVal;
   }
 
-  function findBestMove(board, player){
+  function findBestMove(board, player) {
     let bestVal = -1000;
     let bestMove = -1;
 
-    for(let i = 0; i<board.length; i+=1){
-      if(board[i] === ""){
-         board[i] = player.getName();
-         const moveVal = minimax(board, 0, player, false);
-         board[i] = "";
+    for (let i = 0; i < board.length; i += 1) {
+      if (board[i] === "") {
+        // console.log("Found empty cell: ", i);
 
-         if(moveVal > bestVal){
-            bestMove = i;
-            bestVal = moveVal;
-         }
+        board[i] = player.getName();
+        const moveVal = minimax(board, 0, player, false);
+        board[i] = "";
+
+        // console.log("moveVal = ", moveVal);
+        // console.log("bestVal = ", bestVal);
+        if (moveVal > bestVal) {
+          bestMove = i;
+          bestVal = moveVal;
+        }
       }
     }
     return bestMove;
@@ -133,13 +146,13 @@ const gameboard = (() => {
     return findBestMove(dummyBoard, player);
   }
 
-  return { resetPlayerMoves, playerMove, viewGameboard , getMove};
+  return { resetPlayerMoves, playerMove, viewGameboard, getMove };
 })();
 
 // Factory for creating players
 const playerFactory = (name) => {
   const getName = () => name;
-  const getOpponent = () => name === "X" ? "O":"X";
+  const getOpponent = () => (name === "X" ? "O" : "X");
 
   return { getName, getOpponent };
 };
@@ -172,13 +185,13 @@ const game = (() => {
     backdrop.classList.add("open");
   }
 
-  function highlightWinner(winningSquares){
-    winningSquares.forEach( (square) => {
+  function highlightWinner(winningSquares) {
+    winningSquares.forEach((square) => {
       squares[square].classList.add("winner");
     });
   }
 
-  function drawMark(square, mark){
+  function drawMark(square, mark) {
     square.appendChild(mark);
   }
 
@@ -191,18 +204,21 @@ const game = (() => {
       drawMark(this, x.xContainer);
     } else {
       const o = oMarker();
-      drawMark(this,o.oContainer);
+      drawMark(this, o.oContainer);
     }
     const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
     // console.log(turnResult);
     if (Array.isArray(turnResult)) {
-      const playerMark = currentPlayer.getName() === "X" ? xMarker("winner").xContainer : oMarker("winner").oContainer;
+      const playerMark =
+        currentPlayer.getName() === "X"
+          ? xMarker("winner").xContainer
+          : oMarker("winner").oContainer;
       highlightWinner(turnResult);
       winnerDisplay.appendChild(playerMark);
       openModal();
     } else if (turnResult === "TIE") {
-      winnerDisplay.textContent = "TIE"
+      winnerDisplay.textContent = "TIE";
       openModal();
     } else {
       toggleTurn();
@@ -227,7 +243,7 @@ const game = (() => {
     backdrop.classList.remove("open");
     modal.classList.remove("open");
     winnerDisplay.textContent = "";
-    squares.forEach(square => {
+    squares.forEach((square) => {
       square.classList.remove("winner");
     });
     resetGame();
@@ -244,3 +260,9 @@ const game = (() => {
 })();
 
 game.startGame();
+
+const playerX = playerFactory("X");
+const playerO = playerFactory("O");
+console.log(
+  gameboard.getMove(["X", "O", "X", "O", "O", "X", "", "", ""], playerX)
+);
