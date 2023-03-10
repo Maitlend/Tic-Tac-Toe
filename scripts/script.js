@@ -78,10 +78,15 @@ const gameboard = (() => {
 
   function minimax(board, depth, player, isMaximizer) {
     const score = evaluate(board);
-    // console.log("score = ", score);
-
-    if (score === 10 || score === -10) {
-      return score;
+  
+    if (score === 10) {
+      // console.log("score = ", score-depth);
+      return score - depth;
+      
+    }
+    if (score === -10) {
+      // console.log("score = ", score+depth);
+      return score + depth;
     }
 
     if (!isMovesLeft(board)) {
@@ -99,8 +104,10 @@ const gameboard = (() => {
             minimax(board, depth + 1, player, !isMaximizer)
           );
           board[i] = "";
+          // console.log("bestVal inside of minimax: ", bestVal);
         }
       }
+      // console.log("Returning bestVal inside of minimax: ", bestVal);
       return bestVal;
     }
 
@@ -131,19 +138,21 @@ const gameboard = (() => {
         const moveVal = minimax(board, 0, player, false);
         board[i] = "";
 
-        // console.log("moveVal = ", moveVal);
-        // console.log("bestVal = ", bestVal);
+        // console.log(`moveVal: ${moveVal} > bestVal: ${bestVal}: `, moveVal>bestVal);
         if (moveVal > bestVal) {
           bestMove = i;
           bestVal = moveVal;
         }
+        // console.log("bestMove = ", bestMove);
+        // console.log("moveVal = ", moveVal);
+        // console.log("bestVal = ", bestVal);
       }
     }
     return bestMove;
   }
 
-  function getMove(dummyBoard, player) {
-    return findBestMove(dummyBoard, player);
+  function getMove(board, player) {
+    return findBestMove(playerMoves, player);
   }
 
   return { resetPlayerMoves, playerMove, viewGameboard, getMove };
@@ -167,6 +176,7 @@ const game = (() => {
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
+  let gameOver = false;
 
   for (let i = 0; i <= 8; i += 1) {
     squares.push(document.getElementById(`cell-${i}`));
@@ -205,6 +215,7 @@ const game = (() => {
     } else {
       const o = oMarker();
       drawMark(this, o.oContainer);
+      // console.log(gameboard.getMove(null, playerX));
     }
     const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
@@ -217,12 +228,21 @@ const game = (() => {
       highlightWinner(turnResult);
       winnerDisplay.appendChild(playerMark);
       openModal();
+      gameOver = true;
     } else if (turnResult === "TIE") {
       winnerDisplay.textContent = "TIE";
       openModal();
+      gameOver = true;
     } else {
+      // console.log(`Best move for player ${currentPlayer.getOpponent()}: `, gameboard.getMove(null, playerX));
       toggleTurn();
     }
+    if(currentPlayer === playerO && gameOver === false){
+      const aiMove = gameboard.getMove(null, playerX);
+      // console.log(`AI Move: ${aiMove}`);
+      squares[aiMove].click();
+    }
+
   }
 
   function resetCellListeners() {
@@ -237,6 +257,8 @@ const game = (() => {
       squares[index].textContent = "";
     });
     resetCellListeners();
+    gameOver = false;
+    currentPlayer = playerX;
   }
 
   function closeModal() {
@@ -260,9 +282,3 @@ const game = (() => {
 })();
 
 game.startGame();
-
-const playerX = playerFactory("X");
-const playerO = playerFactory("O");
-console.log(
-  gameboard.getMove(["X", "O", "X", "O", "O", "X", "", "", ""], playerX)
-);
