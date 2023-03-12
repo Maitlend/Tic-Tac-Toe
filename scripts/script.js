@@ -141,14 +141,11 @@ const game = (() => {
       openModal();
       gameOver = true;
     } else {
-      console.log(`Best move for player ${playerO.getName()}: `, gameboard.getMove(null, playerX));
       toggleTurn();
     }
-    if(currentPlayer === playerO && gameOver === false){
-      const aiMove = gameboard.getMove(null, playerO);
-      console.log(`AI Move: ${aiMove}`);
-      squares[aiMove].click();
-    }
+    // if(currentPlayer === playerO && gameOver === false){
+    //   squares[aiMove].click();
+    // }
 
   }
 
