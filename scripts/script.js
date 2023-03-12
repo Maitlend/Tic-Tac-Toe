@@ -16,6 +16,17 @@ const gameboard = (() => {
     // console.log(playerMoves);
   }
 
+  // function printGameboard(board, color) {
+  //   console.log("******** Printing Board ********");
+  //   for(let i = 0; i<9 ; i+=3){
+  //     let mark = board[i] !== "" ? board[i] : " ";
+  //     let mark2 = board[i] !== "" ? board[i+1] : " ";
+  //     let mark3 = board[i] !== "" ? board[i+2] : " ";
+  //     console.log(`%c          ${mark} | ${mark2} | ${mark3} `, `color: ${color}`);
+  //   }
+  //   console.log("*******************************");
+  // }
+
   function resetPlayerMoves() {
     playerMoves = ["", "", "", "", "", "", "", "", ""];
   }
@@ -51,111 +62,7 @@ const gameboard = (() => {
     return turnResult(player);
   }
 
-  function isMovesLeft(board) {
-    const foundEmpty = board.find((move) => move === "");
-    return foundEmpty !== undefined;
-  }
-
-  function evaluate(board) {
-    const xPositions = currentPlayerIndexes("X", board);
-    const oPositions = currentPlayerIndexes("O", board);
-    // console.log(xPositions);
-
-    // console.log("Inside of evaluate(): ", board);
-    for (let i = 0; i < winConditions.length; i += 1) {
-      const xWin = winConditions[i].every((val) => xPositions.includes(val));
-      const oWin = winConditions[i].every((val) => oPositions.includes(val));
-      // console.log("xWin: ", xWin, "oWin: ", oWin);
-      if (xWin) {
-        return 10;
-      }
-      if (oWin) {
-        return -10;
-      }
-    }
-    return 0;
-  }
-
-  function minimax(board, depth, player, isMaximizer) {
-    const score = evaluate(board);
-  
-    if (score === 10) {
-      // console.log("score = ", score-depth);
-      return score - depth;
-      
-    }
-    if (score === -10) {
-      // console.log("score = ", score+depth);
-      return score + depth;
-    }
-
-    if (!isMovesLeft(board)) {
-      return 0;
-    }
-
-    // Check if player is Maximizer
-    if (isMaximizer) {
-      let bestVal = -1000;
-      for (let i = 0; i < board.length; i += 1) {
-        if (board[i] === "") {
-          board[i] = player.getName();
-          bestVal = Math.max(
-            bestVal,
-            minimax(board, depth + 1, player, !isMaximizer)
-          );
-          board[i] = "";
-          // console.log("bestVal inside of minimax: ", bestVal);
-        }
-      }
-      // console.log("Returning bestVal inside of minimax: ", bestVal);
-      return bestVal;
-    }
-
-    // Player is minimizer
-    let bestVal = 1000;
-    for (let i = 0; i < board.length; i += 1) {
-      if (board[i] === "") {
-        board[i] = player.getOpponent();
-        bestVal = Math.min(
-          bestVal,
-          minimax(board, depth + 1, player, !isMaximizer)
-        );
-        board[i] = "";
-      }
-    }
-    return bestVal;
-  }
-
-  function findBestMove(board, player) {
-    let bestVal = -1000;
-    let bestMove = -1;
-
-    for (let i = 0; i < board.length; i += 1) {
-      if (board[i] === "") {
-        // console.log("Found empty cell: ", i);
-
-        board[i] = player.getName();
-        const moveVal = minimax(board, 0, player, false);
-        board[i] = "";
-
-        // console.log(`moveVal: ${moveVal} > bestVal: ${bestVal}: `, moveVal>bestVal);
-        if (moveVal > bestVal) {
-          bestMove = i;
-          bestVal = moveVal;
-        }
-        // console.log("bestMove = ", bestMove);
-        // console.log("moveVal = ", moveVal);
-        // console.log("bestVal = ", bestVal);
-      }
-    }
-    return bestMove;
-  }
-
-  function getMove(board, player) {
-    return findBestMove(playerMoves, player);
-  }
-
-  return { resetPlayerMoves, playerMove, viewGameboard, getMove };
+  return { resetPlayerMoves, playerMove, viewGameboard };
 })();
 
 // Factory for creating players
@@ -234,12 +141,12 @@ const game = (() => {
       openModal();
       gameOver = true;
     } else {
-      // console.log(`Best move for player ${currentPlayer.getOpponent()}: `, gameboard.getMove(null, playerX));
+      console.log(`Best move for player ${playerO.getName()}: `, gameboard.getMove(null, playerX));
       toggleTurn();
     }
     if(currentPlayer === playerO && gameOver === false){
-      const aiMove = gameboard.getMove(null, playerX);
-      // console.log(`AI Move: ${aiMove}`);
+      const aiMove = gameboard.getMove(null, playerO);
+      console.log(`AI Move: ${aiMove}`);
       squares[aiMove].click();
     }
 
