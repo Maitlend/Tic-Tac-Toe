@@ -164,14 +164,15 @@ const game = (() => {
   const resetGameBtn = document.getElementById("reset-game-btn");
   const backdrop = document.querySelector(".backdrop");
   const winnerDisplay = document.getElementById("winner-mark");
-  const squares = [];
+  const cells = [];
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
   let gameOver = false;
 
+  // Bind dom cells to cells array
   for (let i = 0; i <= 8; i += 1) {
-    squares.push(document.getElementById(`cell-${i}`));
+    cells.push(document.getElementById(`cell-${i}`));
   }
 
   function toggleTurn() {
@@ -187,9 +188,9 @@ const game = (() => {
     backdrop.classList.add("open");
   }
 
-  function highlightWinner(winningSquares) {
-    winningSquares.forEach((square) => {
-      squares[square].classList.add("winner");
+  function highlightLane(winningCells) {
+    winningCells.forEach((cell) => {
+      cells[cell].classList.add("winner");
     });
   }
 
@@ -198,26 +199,30 @@ const game = (() => {
   }
 
   function cellClicked() {
-    // Create X or O and insert into cell
+    // Create X or O and insert into DOM cell
     const playerType = currentPlayer.getName();
     if (playerType === "X") {
-      // console.log("Player X");
       const x = xMarker();
       drawMark(this, x.xContainer);
     } else {
       const o = oMarker();
       drawMark(this, o.oContainer);
-      // console.log(gameboard.getMove(null, playerX));
     }
+
+    // Grab the id by pulling last character of id attribute of DOM cell
     const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
-    // console.log(turnResult);
+    // If turnResult is an array, game has been won with lane contained in turnResult
     if (Array.isArray(turnResult)) {
-      const playerMark =
-          currentPlayer.getName() === "X"
-          ? xMarker("winner").xContainer
-          : oMarker("winner").oContainer;
-      highlightWinner(turnResult);
+      let playerMark;
+      if(currentPlayer.getName() === "X"){
+        playerMark = xMarker("winner").xContainer;
+      }
+      else{
+        playerMark = oMarker("winner").oContainer;
+      }
+      // Highlight winning lane and display winner on screen
+      highlightLane(turnResult);
       winnerDisplay.appendChild(playerMark);
       openModal();
       gameOver = true;
@@ -228,22 +233,23 @@ const game = (() => {
     } else {
       toggleTurn();
     }
+    // Human player has made move, time for ai to make a move if game is not over
     if(currentPlayer === playerO && gameOver === false){
       const aiMove = gameboard.getMove(playerO);
-      squares[aiMove].click();
+      cells[aiMove].click();
     }
   }
 
   function resetCellListeners() {
-    squares.forEach((cell) =>
+    cells.forEach((cell) =>
       cell.addEventListener("click", cellClicked, { once: true })
     );
   }
 
   function resetGame() {
     gameboard.resetPlayerMoves();
-    squares.forEach((element, index) => {
-      squares[index].textContent = "";
+    cells.forEach((element, index) => {
+      cells[index].textContent = "";
     });
     resetCellListeners();
     gameOver = false;
@@ -254,7 +260,7 @@ const game = (() => {
     backdrop.classList.remove("open");
     modal.classList.remove("open");
     winnerDisplay.textContent = "";
-    squares.forEach((square) => {
+    cells.forEach((square) => {
       square.classList.remove("winner");
     });
     resetGame();
