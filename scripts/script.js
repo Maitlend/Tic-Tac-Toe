@@ -62,6 +62,13 @@ const gameboard = (() => {
         let minVal = 0;
         let maxVal = 0;
 
+        // Check edge case lose scenario for player
+        if(cell === 1){
+          if(board[0] === player.getOpponent() && board[8] === player.getOpponent() ||
+             board[2] === player.getOpponent() && board[6] === player.getOpponent()){
+            return 1;
+          }
+        }
         // Loop through each cell lane
         for (let cellLane = 0; cellLane < cellLanes.length; cellLane += 1) {
           const boardLaneValues = board.filter((cell, index) => cellLanes[cellLane].includes(index));
@@ -73,6 +80,7 @@ const gameboard = (() => {
               (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
             console.log(`Lane ${cellLanes[cellLane]} contains two own marks ${player.getName()}, maxVal = 10 as this will win game.`);
             maxVal = 10;
+            return cell;
           }  
           if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
             console.log(`Lane ${cellLanes[cellLane]} does not contain an ${player.getOpponent()}, incrementing maxVal by 1`);
