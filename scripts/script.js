@@ -73,35 +73,27 @@ const gameboard = (() => {
         // Loop through each lane in our cellLanes array
         for (let lane = 0; lane < cellLanes.length; lane += 1) {
           const boardLaneValues = board.filter((cell, index) => cellLanes[lane].includes(index));
-          console.log(`Adjusting min/max of cell ${cell} for lane ${cellLanes[lane]}`);
-          console.log(`Board values for lane ${cellLanes[lane]} = ${boardLaneValues}`);
-
           // Check lane for two current player marks (win scenario) immeditaly return current cell if so.
           if ((boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
               (boardLaneValues[1] === player.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
               (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
-            console.log(`Lane ${cellLanes[lane]} contains two own marks ${player.getName()}, maxVal = 10 as this will win game.`);
             maxVal = 10;
             return cell;
           }  
           // If lane does not contain opponent mark maxVal of cell increments by one
           if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
-            console.log(`Lane ${cellLanes[lane]} does not contain an ${player.getOpponent()}, incrementing maxVal by 1`);
             maxVal += 1;
             // If lane also does not contain current players mark maxVal of cell increments by one 
             if(boardLaneValues.includes(player.getName())){
-              console.log(`Lane ${cellLanes[lane]} also contains own mark ${player.getName()}, incrementing maxVal by 1`);
               maxVal += 1;
             }
           }
           // If lane does not contain current players mark, minVal of cell decrements by one
           // Only enter if minVal has not already been set to -10 by a previous lane check on current cell
           if(!boardLaneValues.includes(player.getName()) && minVal !== 10){
-            console.log(`Lane ${cellLanes[lane]} does not contain own mark ${player.getName()}, decrementing minVal by 1`);
             minVal -= 1;
             // If lane also contains opponents mark, minVal of cell decrements by one
             if(boardLaneValues.includes(player.getOpponent())){
-              console.log(`Lane ${cellLanes[lane]} also contains opponent mark ${player.getOpponent()}, decrementing minVal by 1`);
               minVal -= 1;
             }
           }
@@ -109,7 +101,6 @@ const gameboard = (() => {
           if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
               (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
               (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
-            console.log(`Lane ${cellLanes[lane]} contains two opponent marks ${player.getOpponent()}, minVal = -10 as this will lose game.`);
             minVal = -10;
           }  
         }
@@ -121,8 +112,6 @@ const gameboard = (() => {
         miniMaxVals.push(board[cell]);
       }
     }
-    // console.log(miniMaxVals);
-
     // Determine best move according to miniMaxVals array.
     let move = -1;
     for(let i = 0; i < miniMaxVals.length; i+=1){
@@ -282,9 +271,3 @@ const game = (() => {
 })();
 
 game.startGame();
-
-// const playerO = playerFactory("O");
-// const playerX = playerFactory("X");
-
-// gameboard.getMove(["","X","O","","X","O","","",""], playerX);
-// gameboard.getMove(["","","O","","X","","","","O"], playerX);
