@@ -61,6 +61,7 @@ const gameboard = (() => {
         const cellLanes = lanes.filter((lane) => lane.includes(cell));
         let minVal = 0;
         let maxVal = 0;
+
         // Loop through each cell lane
         for (let cellLane = 0; cellLane < cellLanes.length; cellLane += 1) {
           const boardLaneValues = board.filter((cell, index) => cellLanes[cellLane].includes(index));
@@ -71,7 +72,7 @@ const gameboard = (() => {
               (boardLaneValues[1] === player.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
               (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
             console.log(`Lane ${cellLanes[cellLane]} contains two own marks ${player.getName()}, maxVal = 10 as this will win game.`);
-            minVal = 10;
+            maxVal = 10;
           }  
           if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
             console.log(`Lane ${cellLanes[cellLane]} does not contain an ${player.getOpponent()}, incrementing maxVal by 1`);
@@ -92,7 +93,7 @@ const gameboard = (() => {
           if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
               (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
               (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
-            console.log(`Lane ${cellLanes[cellLane]} contains two opponent marks ${player.getOpponent()}, minVal = 10 as this will lose game.`);
+            console.log(`Lane ${cellLanes[cellLane]} contains two opponent marks ${player.getOpponent()}, minVal = -10 as this will lose game.`);
             minVal = -10;
           }  
         }
