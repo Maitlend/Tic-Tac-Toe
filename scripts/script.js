@@ -66,7 +66,7 @@ const gameboard = (() => {
           const boardLaneValues = board.filter((cell, index) => cellLanes[cellLane].includes(index));
           console.log(`Adjusting min/max of cell ${cell} for lane ${cellLanes[cellLane]}`);
           console.log(`Board values for lane ${cellLanes[cellLane]} = ${boardLaneValues}`);
-          
+
           if ((boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
               (boardLaneValues[1] === player.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
               (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
@@ -160,7 +160,7 @@ const game = (() => {
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
-  // let gameOver = false;
+  let gameOver = false;
 
   for (let i = 0; i <= 8; i += 1) {
     squares.push(document.getElementById(`cell-${i}`));
@@ -206,24 +206,24 @@ const game = (() => {
     // console.log(turnResult);
     if (Array.isArray(turnResult)) {
       const playerMark =
-        currentPlayer.getName() === "X"
+          currentPlayer.getName() === "X"
           ? xMarker("winner").xContainer
           : oMarker("winner").oContainer;
       highlightWinner(turnResult);
       winnerDisplay.appendChild(playerMark);
       openModal();
-      // gameOver = true;
+      gameOver = true;
     } else if (turnResult === "TIE") {
       winnerDisplay.textContent = "TIE";
       openModal();
-      // gameOver = true;
+      gameOver = true;
     } else {
       toggleTurn();
-      gameboard.getMove(currentPlayer);
     }
-    // if(currentPlayer === playerO && gameOver === false){
-    //   squares[aiMove].click();
-    // }
+    if(currentPlayer === playerO && gameOver === false){
+      const aiMove = gameboard.getMove(playerO);
+      squares[aiMove].click();
+    }
   }
 
   function resetCellListeners() {
@@ -238,7 +238,7 @@ const game = (() => {
       squares[index].textContent = "";
     });
     resetCellListeners();
-    // gameOver = false;
+    gameOver = false;
     currentPlayer = playerX;
   }
 
