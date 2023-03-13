@@ -16,17 +16,6 @@ const gameboard = (() => {
     // console.log(playerMoves);
   }
 
-  // function printGameboard(board, color) {
-  //   console.log("******** Printing Board ********");
-  //   for(let i = 0; i<9 ; i+=3){
-  //     let mark = board[i] !== "" ? board[i] : " ";
-  //     let mark2 = board[i] !== "" ? board[i+1] : " ";
-  //     let mark3 = board[i] !== "" ? board[i+2] : " ";
-  //     console.log(`%c          ${mark} | ${mark2} | ${mark3} `, `color: ${color}`);
-  //   }
-  //   console.log("*******************************");
-  // }
-
   function resetPlayerMoves() {
     playerMoves = ["", "", "", "", "", "", "", "", ""];
   }
@@ -62,7 +51,95 @@ const gameboard = (() => {
     return turnResult(player);
   }
 
-  return { resetPlayerMoves, playerMove, viewGameboard };
+  function miniMax(board, lanes, player) {
+    const miniMaxVals = []
+    // Loop each cell to determine min/max value of empty cells
+    for (let cell = 0; cell < board.length; cell += 1) {
+      if (board[cell] === "") {
+        console.log(`Found empty cell ${cell}`);
+        // const miniMaxVal = [];
+        const cellLanes = lanes.filter((lane) => lane.includes(cell));
+        let minVal = 0;
+        let maxVal = 0;
+        // Loop through each cell lane
+        for (let cellLane = 0; cellLane < cellLanes.length; cellLane += 1) {
+          const boardLaneValues = board.filter((cell, index) => cellLanes[cellLane].includes(index));
+          console.log(`Adjusting min/max of cell ${cell} for lane ${cellLanes[cellLane]}`);
+          console.log(`Board values for lane ${cellLanes[cellLane]} = ${boardLaneValues}`);
+          
+          if ((boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
+              (boardLaneValues[1] === player.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
+              (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
+            console.log(`Lane ${cellLanes[cellLane]} contains two own marks ${player.getName()}, maxVal = 10 as this will win game.`);
+            minVal = 10;
+          }  
+          if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
+            console.log(`Lane ${cellLanes[cellLane]} does not contain an ${player.getOpponent()}, incrementing maxVal by 1`);
+            maxVal += 1;
+            if(boardLaneValues.includes(player.getName())){
+              console.log(`Lane ${cellLanes[cellLane]} also contains own mark ${player.getName()}, incrementing maxVal by 1`);
+              maxVal += 1;
+            }
+          }
+          if(!boardLaneValues.includes(player.getName()) && minVal !== 10){
+            console.log(`Lane ${cellLanes[cellLane]} does not contain own mark ${player.getName()}, decrementing minVal by 1`);
+            minVal -= 1;
+            if(boardLaneValues.includes(player.getOpponent())){
+              console.log(`Lane ${cellLanes[cellLane]} also contains opponent mark ${player.getOpponent()}, decrementing minVal by 1`);
+              minVal -= 1;
+            }
+          }
+          if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
+              (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
+              (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
+            console.log(`Lane ${cellLanes[cellLane]} contains two opponent marks ${player.getOpponent()}, minVal = 10 as this will lose game.`);
+            minVal = -10;
+          }  
+        }
+        const miniMaxVal = [minVal,maxVal];
+        miniMaxVals.push(miniMaxVal);
+      }
+      else{
+        miniMaxVals.push(board[cell]);
+      }
+    }
+    console.log(miniMaxVals);
+
+    let move = -1;
+    for(let i = 0; i < miniMaxVals.length; i+=1){
+      const miniMaxVal = miniMaxVals[i];
+      if(Array.isArray(miniMaxVal)){
+        if(miniMaxVal[1] === 10){
+          move = i;
+          break;
+        }
+        else if(miniMaxVal[0] === -10 ){
+          move = i;
+        }
+        else{
+          miniMaxVals[i] = Math.abs(miniMaxVal[0]) + miniMaxVal[1];
+        }
+      }
+    }
+  
+    if(move === -1){
+      let max = -50;
+      for (let i = 0; i < miniMaxVals.length; i+=1) {
+        if (typeof miniMaxVals[i] === 'number' && miniMaxVals[i] > max) {
+            move = i;
+            max = miniMaxVals[i];
+        }
+      }
+    }
+    console.log(move);
+    return move;
+  }
+
+  function getMove(player) {
+    return miniMax(playerMoves, winConditions, player);
+  }
+
+  return { resetPlayerMoves, playerMove, viewGameboard, getMove };
 })();
 
 // Factory for creating players
@@ -83,7 +160,7 @@ const game = (() => {
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
-  let gameOver = false;
+  // let gameOver = false;
 
   for (let i = 0; i <= 8; i += 1) {
     squares.push(document.getElementById(`cell-${i}`));
@@ -135,18 +212,18 @@ const game = (() => {
       highlightWinner(turnResult);
       winnerDisplay.appendChild(playerMark);
       openModal();
-      gameOver = true;
+      // gameOver = true;
     } else if (turnResult === "TIE") {
       winnerDisplay.textContent = "TIE";
       openModal();
-      gameOver = true;
+      // gameOver = true;
     } else {
       toggleTurn();
+      gameboard.getMove(currentPlayer);
     }
     // if(currentPlayer === playerO && gameOver === false){
     //   squares[aiMove].click();
     // }
-
   }
 
   function resetCellListeners() {
@@ -161,7 +238,7 @@ const game = (() => {
       squares[index].textContent = "";
     });
     resetCellListeners();
-    gameOver = false;
+    // gameOver = false;
     currentPlayer = playerX;
   }
 
@@ -186,3 +263,9 @@ const game = (() => {
 })();
 
 game.startGame();
+
+// const playerO = playerFactory("O");
+// const playerX = playerFactory("X");
+
+// gameboard.getMove(["","X","O","","X","O","","",""], playerX);
+// gameboard.getMove(["","","O","","X","","","","O"], playerX);
