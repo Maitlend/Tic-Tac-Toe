@@ -177,6 +177,7 @@ const playerFactory = (name) => {
 
 // Module for game.
 const game = (() => {
+  const gameTypeSelection = document.getElementById("game-option-dropdown");
   const modal = document.querySelector(".modal");
   const resetGameBtn = document.getElementById("reset-game-btn");
   const backdrop = document.querySelector(".backdrop");
@@ -185,6 +186,7 @@ const game = (() => {
   const playerO = playerFactory("O");
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
+  let playingComputer = false;
   let gameOver = false;
 
   // Bind dom cells to cells array.
@@ -250,8 +252,8 @@ const game = (() => {
     } else {
       toggleTurn();
     }
-    // Human player has made move, time for ai to make a move if game is not over.
-    if(currentPlayer === playerO && gameOver === false){
+    // If set to play computer and game is not over, have ai make move.
+    if(playingComputer && currentPlayer === playerO && gameOver === false){
       const aiMove = gameboard.getMove(playerO);
       cells[aiMove].click();
     }
@@ -273,6 +275,27 @@ const game = (() => {
     currentPlayer = playerX;
   }
 
+  function setGameType(){
+    const {value} = document.querySelector('#form-drop-down');
+    if(value === 'pvp'){
+      console.log('Setting game type to pvp');
+      playingComputer = false;
+    } else if(value === 'easy'){
+      console.log('Setting game type to easy');
+      playingComputer = true;
+    } else if(value === 'medium'){
+      console.log('Setting game type to medium');
+      playingComputer = true;
+    } else if(value === 'hard'){
+      console.log('Setting game type to hard');
+      playingComputer = true;
+    } else if(value === 'unbeatable'){
+      console.log('Setting game type to unbeatable');
+      playingComputer = true;
+    }
+    resetGame();
+  }
+
   function closeModal() {
     backdrop.classList.remove("open");
     modal.classList.remove("open");
@@ -285,12 +308,15 @@ const game = (() => {
 
   backdrop.addEventListener("click", closeModal);
   resetGameBtn.addEventListener("click", closeModal);
+  gameTypeSelection.addEventListener("change", setGameType);
 
   function startGame() {
     resetCellListeners();
   }
 
-  return { startGame };
+  return {startGame};
 })();
 
 game.startGame();
+
+
