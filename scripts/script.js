@@ -96,7 +96,7 @@ const gameboard = (() => {
     return [minVal, maxVal, maxVal + Math.abs(minVal)];
   }
 
-  function findLose(miniMaxVals){
+  function findLoseState(miniMaxVals){
     for(let i = 0; i < miniMaxVals.length; i+=1){
       const miniMaxVal = miniMaxVals[i];
       // Ensure value is a min/max array instead of player mark (invalid move).
@@ -151,10 +151,10 @@ const gameboard = (() => {
       }
     }
     // If a lose scenario exists on board assign to move, else assign -1.
-    let move = findLose(miniMaxVals);
+    let move = findLoseState(miniMaxVals);
     
-    // If no lose scenario found, choose move according to highest payoff.
     if(move === -1){
+      // Choose move according to highest payoff.
       move = findBestMove(miniMaxVals);
     }
     return move;
