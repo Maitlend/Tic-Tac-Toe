@@ -62,12 +62,12 @@ const gameboard = (() => {
     // Loop through each lane in our cellLanes array.
     for (let lane = 0; lane < cellLanes.length; lane += 1) {
       const boardLaneValues = board.filter((cell, index) => cellLanes[lane].includes(index));
-      // Check lane for two current player marks (win scenario) immeditaly return current cell if so.
+      // Check lane for two current player marks (win scenario) break and return immediately.
       if ((boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
           (boardLaneValues[1] === player.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
           (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
         maxVal = 10;
-        return cell;
+        break;
       }  
       // If lane does not contain opponent mark maxVal of cell increments by one.
       if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
@@ -93,7 +93,7 @@ const gameboard = (() => {
         minVal = -10;
       }  
     }
-    return [minVal,maxVal, maxVal + Math.abs(minVal)];
+    return [minVal, maxVal, maxVal + Math.abs(minVal)];
   }
 
   function findLose(miniMaxVals){
@@ -137,12 +137,11 @@ const gameboard = (() => {
             return 1;
           }
         }
-        // Set miniMaxVal to array containing [minVal,MaxVal, abs(minVal) + maxVal (move payoff)].
-        // If a winning condition is found miniMax is instead set to cell #.
+        // Set miniMaxVal to array containing [minVal,MaxVal, abs(minVal) + maxVal (move payoff)] values.
         const miniMaxVal = getMiniMaxVal(board, cell, lanes, player);
-        // If miniMaxVal is not an array it contains winning move.
-        if(!Array.isArray(miniMaxVal)){
-          return miniMaxVal
+        // Check if maxVal is 10 (winning move).
+        if(miniMaxVal[1] === 10){
+          return miniMaxVals.length;
         }
         miniMaxVals.push(miniMaxVal);
       }
