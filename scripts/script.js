@@ -54,8 +54,37 @@ const gameboard = (() => {
     return turnResult(player);
   }
 
+
+  function findLose(miniMaxVals){
+    for(let i = 0; i < miniMaxVals.length; i+=1){
+      const miniMaxVal = miniMaxVals[i];
+      // Ensure value is a min/max array instead of player mark (invalid move).
+      if(Array.isArray(miniMaxVal)){
+        // Win condition accounted for already, check index for lose scenario.
+        if(miniMaxVal[0] === -10 ){
+          return i;
+        }
+      }
+    }
+    return -1;
+  }
+
+  function findBestMove(miniMaxVals){
+      let max = -50;
+      let move = -1;
+      for (let i = 0; i < miniMaxVals.length; i+=1) {
+        // Check if potential move is valid and greater than current move value.
+        if (typeof miniMaxVals[i][2] === 'number' && miniMaxVals[i][2] > max) {
+            move = i;
+            max = miniMaxVals[i][2];
+        }
+      }
+      return move;
+  }
+
   function miniMax(board, lanes, player) {
     const miniMaxVals = []
+
     // Loop each board cell to determine min/max value of empty cells
     for (let cell = 0; cell < board.length; cell += 1) {
       if (board[cell] === "") {
@@ -104,7 +133,7 @@ const gameboard = (() => {
             minVal = -10;
           }  
         }
-        const miniMaxVal = [minVal,maxVal];
+        const miniMaxVal = [minVal,maxVal, maxVal + Math.abs(minVal)];
         miniMaxVals.push(miniMaxVal);
       }
       // Cell was not empty, instead push player's mark to array to keep proper length/indexes.
@@ -112,34 +141,15 @@ const gameboard = (() => {
         miniMaxVals.push(board[cell]);
       }
     }
-    // Determine best move according to miniMaxVals array.
-    let move = -1;
-    for(let i = 0; i < miniMaxVals.length; i+=1){
-      const miniMaxVal = miniMaxVals[i];
-      // Ensure value is a min/max array instead of player mark (invalid move).
-      if(Array.isArray(miniMaxVal)){
-        // Win condition accounted for already, check index for lose scenario.
-        if(miniMaxVal[0] === -10 ){
-          move = i;
-        }
-        // index is not a lose scenario, add maxValue and absolute value of minVal (higher sum = higher payoff).
-        else{
-          miniMaxVals[i] = Math.abs(miniMaxVal[0]) + miniMaxVal[1];
-        }
-      }
+
+    // If a lose scenario exists on board assign to move else -1
+    let move = findLose(miniMaxVals);
+    
+    // If no lose scenario found, choose move according to highest payoff
+    if(move === -1){
+      move = findBestMove(miniMaxVals);
     }
     
-    // No lose scenario on the board, choose move according to highest payoff
-    if(move === -1){
-      let max = -50;
-      for (let i = 0; i < miniMaxVals.length; i+=1) {
-        // Check if potential move is valid and greater than current move value.
-        if (typeof miniMaxVals[i] === 'number' && miniMaxVals[i] > max) {
-            move = i;
-            max = miniMaxVals[i];
-        }
-      }
-    }
     return move;
   }
 
