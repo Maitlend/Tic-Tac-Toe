@@ -1,4 +1,4 @@
-// Module for gameboard
+// Module for gameboard.
 const gameboard = (() => {
   let playerMoves = ["", "", "", "", "", "", "", "", ""];
   const winConditions = [
@@ -31,18 +31,18 @@ const gameboard = (() => {
   }
 
   function turnResult(player) {
-    // Create an array containing the indexes of current player's moves
+    // Create an array containing the indexes of current player's moves.
     const playerIndexes = currentPlayerIndexes(player.getName(), playerMoves);
 
     for (let i = 0; i < winConditions.length; i += 1) {
       // Check every val of each winCondition to see if player has satisfied a win condition yet.
       const test = winConditions[i].every((val) => playerIndexes.includes(val));
       if (test) {
-        // Win conditions met return winning cells
+        // Win conditions met return winning cells.
         return winConditions[i];
       }
     }
-    // no win yet, check if moves are still left else result is a tie
+    // no win yet, check if moves are still left else result is a tie.
     if (playerMoves.includes("")) {
       return "NONE";
     }
@@ -73,10 +73,11 @@ const gameboard = (() => {
       let max = -50;
       let move = -1;
       for (let i = 0; i < miniMaxVals.length; i+=1) {
+        const {2: moveVal} = miniMaxVals[i];
         // Check if potential move is valid and greater than current move value.
-        if (typeof miniMaxVals[i][2] === 'number' && miniMaxVals[i][2] > max) {
+        if (typeof moveVal === 'number' && moveVal > max) {
             move = i;
-            max = miniMaxVals[i][2];
+            max = moveVal;
         }
       }
       return move;
@@ -85,21 +86,21 @@ const gameboard = (() => {
   function miniMax(board, lanes, player) {
     const miniMaxVals = []
 
-    // Loop each board cell to determine min/max value of empty cells
+    // Loop each board cell to determine min/max value of empty cells.
     for (let cell = 0; cell < board.length; cell += 1) {
       if (board[cell] === "") {
-        // Use filter method to find all lanes that contain current cell
+        // Use filter method to find all lanes that contain current cell.
         const cellLanes = lanes.filter((lane) => lane.includes(cell));
         let minVal = 0;
         let maxVal = 0;
-        // Check edge case lose scenario for player
+        // Check edge case lose scenario for player.
         if(cell === 1){
           if(board[0] === player.getOpponent() && board[8] === player.getOpponent() ||
              board[2] === player.getOpponent() && board[6] === player.getOpponent()){
             return 1;
           }
         }
-        // Loop through each lane in our cellLanes array
+        // Loop through each lane in our cellLanes array.
         for (let lane = 0; lane < cellLanes.length; lane += 1) {
           const boardLaneValues = board.filter((cell, index) => cellLanes[lane].includes(index));
           // Check lane for two current player marks (win scenario) immeditaly return current cell if so.
@@ -109,24 +110,24 @@ const gameboard = (() => {
             maxVal = 10;
             return cell;
           }  
-          // If lane does not contain opponent mark maxVal of cell increments by one
+          // If lane does not contain opponent mark maxVal of cell increments by one.
           if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
             maxVal += 1;
-            // If lane also does not contain current players mark maxVal of cell increments by one 
+            // If lane also does not contain current players mark maxVal of cell increments by one.
             if(boardLaneValues.includes(player.getName())){
               maxVal += 1;
             }
           }
-          // If lane does not contain current players mark, minVal of cell decrements by one
-          // Only enter if minVal has not already been set to -10 by a previous lane check on current cell
+          // If lane does not contain current players mark, minVal of cell decrements by one.
+          // Only enter if minVal has not already been set to -10 by a previous lane check on current cell.
           if(!boardLaneValues.includes(player.getName()) && minVal !== 10){
             minVal -= 1;
-            // If lane also contains opponents mark, minVal of cell decrements by one
+            // If lane also contains opponents mark, minVal of cell decrements by one.
             if(boardLaneValues.includes(player.getOpponent())){
               minVal -= 1;
             }
           }
-          // Check lane for two opponent marks (lose scenario)
+          // Check lane for two opponent marks (lose scenario).
           if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
               (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
               (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
@@ -142,10 +143,10 @@ const gameboard = (() => {
       }
     }
 
-    // If a lose scenario exists on board assign to move else -1
+    // If a lose scenario exists on board assign to move else -1.
     let move = findLose(miniMaxVals);
     
-    // If no lose scenario found, choose move according to highest payoff
+    // If no lose scenario found, choose move according to highest payoff.
     if(move === -1){
       move = findBestMove(miniMaxVals);
     }
@@ -160,7 +161,7 @@ const gameboard = (() => {
   return { resetPlayerMoves, playerMove, viewGameboard, getMove };
 })();
 
-// Factory for creating players
+// Factory for creating players.
 const playerFactory = (name) => {
   const getName = () => name;
   const getOpponent = () => (name === "X" ? "O" : "X");
@@ -168,7 +169,7 @@ const playerFactory = (name) => {
   return { getName, getOpponent };
 };
 
-// Module for game
+// Module for game.
 const game = (() => {
   const modal = document.querySelector(".modal");
   const resetGameBtn = document.getElementById("reset-game-btn");
@@ -180,7 +181,7 @@ const game = (() => {
   let currentPlayer = playerX;
   let gameOver = false;
 
-  // Bind dom cells to cells array
+  // Bind dom cells to cells array.
   for (let i = 0; i <= 8; i += 1) {
     cells.push(document.getElementById(`cell-${i}`));
   }
@@ -209,7 +210,7 @@ const game = (() => {
   }
 
   function cellClicked() {
-    // Create X or O and insert into DOM cell
+    // Create X or O and insert into DOM cell.
     const playerType = currentPlayer.getName();
     if (playerType === "X") {
       const x = xMarker();
@@ -219,10 +220,10 @@ const game = (() => {
       drawMark(this, o.oContainer);
     }
 
-    // Grab the id by pulling last character of id attribute of DOM cell
+    // Grab the id by pulling last character of id attribute of DOM cell.
     const id = this.id.at(-1);
     const turnResult = gameboard.playerMove(currentPlayer, id);
-    // If turnResult is an array, game has been won with lane contained in turnResult
+    // If turnResult is an array, game has been won with lane contained in turnResult.
     if (Array.isArray(turnResult)) {
       let playerMark;
       if(currentPlayer.getName() === "X"){
@@ -231,7 +232,7 @@ const game = (() => {
       else{
         playerMark = oMarker("winner").oContainer;
       }
-      // Highlight winning lane and display winner on screen
+      // Highlight winning lane and display winner on screen.
       highlightLane(turnResult);
       winnerDisplay.appendChild(playerMark);
       openModal();
@@ -243,7 +244,7 @@ const game = (() => {
     } else {
       toggleTurn();
     }
-    // Human player has made move, time for ai to make a move if game is not over
+    // Human player has made move, time for ai to make a move if game is not over.
     if(currentPlayer === playerO && gameOver === false){
       const aiMove = gameboard.getMove(playerO);
       cells[aiMove].click();
