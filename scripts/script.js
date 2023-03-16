@@ -127,7 +127,7 @@ const gameboard = (() => {
   function miniMax(board, lanes, player) {
     const miniMaxVals = []
 
-    // Loop each board cell to determine min/max value of empty cells.
+    // Loop each board cell to determine min/max value of empty cells (vaid moves).
     for (let cell = 0; cell < board.length; cell += 1) {
       if (board[cell] === "") {
         // Check edge case lose scenario for player.
@@ -160,7 +160,20 @@ const gameboard = (() => {
     return move;
   }
 
-  function getMove(player) {
+  // Returns a random valid move for ai to make
+  function getEasyMove(){
+    // Mark valid moves in array with index number
+    let openMoves = playerMoves.map((position, index) => position === '' ? index : position);
+    // Filter non valid moves from array
+    openMoves = openMoves.filter(position => Number.isInteger(position));
+    return openMoves[Math.floor(Math.random() * openMoves.length)];
+  }
+
+  function getMove(player, difficulty) {
+    if(difficulty === 'easy'){
+      return getEasyMove();
+    }
+    console.log(difficulty);
     return miniMax(playerMoves, winConditions, player);
   }
 
@@ -187,6 +200,7 @@ const game = (() => {
   const playerX = playerFactory("X");
   let currentPlayer = playerX;
   let playingComputer = false;
+  let computerDifficulty;
   let gameOver = false;
 
   // Bind dom cells to cells array.
@@ -254,7 +268,7 @@ const game = (() => {
     }
     // If set to play computer and game is not over, have ai make move.
     if(playingComputer && currentPlayer === playerO && gameOver === false){
-      const aiMove = gameboard.getMove(playerO);
+      const aiMove = gameboard.getMove(playerO, computerDifficulty);
       cells[aiMove].click();
     }
   }
@@ -278,19 +292,10 @@ const game = (() => {
   function setGameType(){
     const {value} = document.querySelector('#form-drop-down');
     if(value === 'pvp'){
-      console.log('Setting game type to pvp');
+      computerDifficulty = '';
       playingComputer = false;
-    } else if(value === 'easy'){
-      console.log('Setting game type to easy');
-      playingComputer = true;
-    } else if(value === 'medium'){
-      console.log('Setting game type to medium');
-      playingComputer = true;
-    } else if(value === 'hard'){
-      console.log('Setting game type to hard');
-      playingComputer = true;
-    } else if(value === 'unbeatable'){
-      console.log('Setting game type to unbeatable');
+    } else {
+      computerDifficulty = value;
       playingComputer = true;
     }
     resetGame();
@@ -318,5 +323,3 @@ const game = (() => {
 })();
 
 game.startGame();
-
-
