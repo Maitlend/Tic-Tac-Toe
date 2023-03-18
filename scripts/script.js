@@ -155,7 +155,7 @@ const aiPlayer = (name) => {
   }
 
   function findLoseState(miniMaxVals){
-    // Loop through avail cells to prevent a loss if found
+    // Loop through avail cells to prevent a loss if found.
     for(let i = 0; i < miniMaxVals.length; i+=1){
       if(miniMaxVals[i].getMinVal() === -10 ){
         return miniMaxVals[i].getIndex();
@@ -164,55 +164,29 @@ const aiPlayer = (name) => {
     return -1;
   }
 
-  // function viewCurrGroup(array){
-  //   let string = "[";
-  //   for(let i = 0; i < array.length; i+=1){
-  //     string = string.concat(array[i].getIndex(), ", ");
-  //   }
-  //   string = string.concat("]");
-  //   return string;
-  // }
-
-  // function viewGrouped(array){
-  //   let string = "[";
-  //   for(let i = 0; i < array.length; i+=1){
-  //     string = string.concat("[");
-  //     for(let j = 0; j < array[i].length; j+=1){
-  //       string = string.concat(array[i][j].getIndex(), ", ");
-  //     }
-  //     string = string.concat("], ");
-  //   }
-  //   string = string.concat("]");
-  //   return string;
-  // }
-
   function findBestMove(miniMaxVals){
-    // Sort miniMaxVals according to cellVal
+    // Sort miniMaxVals according to cellVal.
     miniMaxVals.sort((cell1, cell2) => (cell1.getCellVal() < cell2.getCellVal()) ? 1 : -1);
 
+    // Organize cells of same cellVal into an array.
     let currGroupVal = miniMaxVals[0].getCellVal();
     let currGroup = [];
     const groupedVals = [];
     for(let i = 0; i < miniMaxVals.length; i+=1){
       const currCell = miniMaxVals[i];
-      // console.log(`Working on cell: ${currCell.getIndex()} with value: ${currCell.getCellVal()}`);
-      // console.log(`currentGroupVal = ${currGroupVal}`);
       if(currCell.getCellVal() === currGroupVal){
-        // console.log("currentGroupVal = currentCell val");
         currGroup.push(currCell);
-        // console.log(viewCurrGroup(currGroup));
       }
       else {
-        // console.log(`currentGroupVal of currCell != ${currGroupVal}`);
-        // console.log(`Pushing ${viewCurrGroup(currGroup)} to grouped vals.`);
         groupedVals.push(currGroup);
-        // console.log(`groupedVals = ${viewGrouped(groupedVals)}`);
         currGroupVal = currCell.getCellVal();
         currGroup = [currCell];
       }
     }
     groupedVals.push(currGroup);
-    // console.log(viewGrouped(groupedVals));
+
+    // Based on aiDifficulty, have computer make a move worse than an optimal one.
+    // Optimal move would be one from first group in groupedVals.
     const randomGroup = Math.random();
     let move = 0;
     if(groupedVals.length > 1){
@@ -226,6 +200,7 @@ const aiPlayer = (name) => {
         }
       }
     }
+    // Randomly pick a cell from group determined in previous block (all of equal value).
     const randomCell = Math.floor(Math.random() * groupedVals[move].length);
     return groupedVals[move][randomCell].getIndex();
   }
