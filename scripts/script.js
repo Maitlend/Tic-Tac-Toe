@@ -79,7 +79,7 @@ const aiPlayer = (name) => {
     aiDifficulty = difficulty;
   };
 
-  function getMiniMaxVal(board, cell, lanes, player){
+  function getMiniMaxVal(board, cell, lanes){
     // Use filter method to find all lanes that intersect current cell.
     const cellLanes = lanes.filter((lane) => lane.includes(cell));
     let minVal = 0;
@@ -88,32 +88,32 @@ const aiPlayer = (name) => {
     for (let lane = 0; lane < cellLanes.length; lane += 1) {
       const boardLaneValues = board.filter((cell, index) => cellLanes[lane].includes(index));
       // Check lane for two current player marks (win scenario) break and return immediately.
-      if ((boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
-          (boardLaneValues[1] === player.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
-          (boardLaneValues[0] === player.getName() && boardLaneValues[0] === boardLaneValues[2])) {
+      if ((boardLaneValues[0] === this.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
+          (boardLaneValues[1] === this.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
+          (boardLaneValues[0] === this.getName() && boardLaneValues[0] === boardLaneValues[2])) {
         maxVal = 10;
         break;
       }  
       // If lane does not contain opponent mark maxVal of cell increments by one.
-      if(!boardLaneValues.includes(player.getOpponent()) && maxVal !== 10){
+      if(!boardLaneValues.includes(this.getOpponent()) && maxVal !== 10){
         maxVal += 1;
         // If lane also does not contain current players mark maxVal of cell increments by one.
-        if(boardLaneValues.includes(player.getName())){
+        if(boardLaneValues.includes(this.getName())){
           maxVal += 1;
         }
       }
       // Check lane for two opponent marks (lose scenario).
-      if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
-          (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
-          (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
+      if ((boardLaneValues[0] === this.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
+          (boardLaneValues[1] === this.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
+          (boardLaneValues[0] === this.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
         minVal = -10;
       }        
       // If lane does not contain current players mark, minVal of cell decrements by one.
       // Only enter if minVal has not already been set to -10 by a previous lane check on current cell.
-      if(!boardLaneValues.includes(player.getName()) && minVal !== -10){
+      if(!boardLaneValues.includes(this.getName()) && minVal !== -10){
         minVal -= 1;
         // If lane also contains opponents mark, minVal of cell decrements by one.
-        if(boardLaneValues.includes(player.getOpponent())){
+        if(boardLaneValues.includes(this.getOpponent())){
           minVal -= 1;
         }
       }
@@ -150,7 +150,7 @@ const aiPlayer = (name) => {
       return move;
   }
 
-  function miniMax(board, lanes, player) {
+  function miniMax(board, lanes) {
     const miniMaxVals = []
 
     // Loop each board cell to determine min/max value of empty cells (vaid moves).
@@ -158,13 +158,13 @@ const aiPlayer = (name) => {
       if (board[cell] === "") {
         // Check edge case lose scenario for player.
         if(cell === 1){
-          if(board[0] === player.getOpponent() && board[8] === player.getOpponent() ||
-             board[2] === player.getOpponent() && board[6] === player.getOpponent()){
+          if(board[0] === this.getOpponent() && board[8] === this.getOpponent() ||
+             board[2] === this.getOpponent() && board[6] === this.getOpponent()){
             return 1;
           }
         }
         // Set miniMaxVal to array containing [minVal,MaxVal, abs(minVal) + maxVal (move payoff)] values.
-        const miniMaxVal = getMiniMaxVal(board, cell, lanes, player);
+        const miniMaxVal = getMiniMaxVal.call(this, board, cell, lanes);
         // Check if maxVal is 10 (winning move).
         if(miniMaxVal[1] === 10){
           return miniMaxVals.length;
@@ -195,12 +195,12 @@ const aiPlayer = (name) => {
     return openMoves[Math.floor(Math.random() * openMoves.length)];
   }
 
-  function getMove(player) {
+  function getMove() {
     const board = gameboard.getGameboard();
     if(aiDifficulty === 'easy'){
       return getEasyMove(board);
     }
-    return miniMax(board, gameboard.getWinConditions(), player);
+    return miniMax.call(this, board, gameboard.getWinConditions());
   }
 
   return { getName, getOpponent, setDifficulty, getMove };
@@ -285,7 +285,7 @@ const game = (() => {
     }
     // If set to play computer and game is not over, have ai make move.
     if(playingComputer && currentPlayer === playerO && gameOver === false){
-      const aiMove = playerO.getMove(playerO);
+      const aiMove = playerO.getMove();
       cells[aiMove].click();
     }
   }
