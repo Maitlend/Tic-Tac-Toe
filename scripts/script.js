@@ -55,7 +55,7 @@ const gameboard = (() => {
   }
 
   function getMiniMaxVal(board, cell, lanes, player){
-    // Use filter method to find all lanes that contain current cell.
+    // Use filter method to find all lanes that intersect current cell.
     const cellLanes = lanes.filter((lane) => lane.includes(cell));
     let minVal = 0;
     let maxVal = 0;
@@ -77,21 +77,22 @@ const gameboard = (() => {
           maxVal += 1;
         }
       }
+      // Check lane for two opponent marks (lose scenario).
+      if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
+          (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
+          (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
+        minVal = -10;
+      }        
       // If lane does not contain current players mark, minVal of cell decrements by one.
       // Only enter if minVal has not already been set to -10 by a previous lane check on current cell.
-      if(!boardLaneValues.includes(player.getName()) && minVal !== 10){
+      if(!boardLaneValues.includes(player.getName()) && minVal !== -10){
         minVal -= 1;
         // If lane also contains opponents mark, minVal of cell decrements by one.
         if(boardLaneValues.includes(player.getOpponent())){
           minVal -= 1;
         }
       }
-      // Check lane for two opponent marks (lose scenario).
-      if ((boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[1]) ||
-          (boardLaneValues[1] === player.getOpponent() && boardLaneValues[1] === boardLaneValues[2]) ||
-          (boardLaneValues[0] === player.getOpponent() && boardLaneValues[0] === boardLaneValues[2])) {
-        minVal = -10;
-      }  
+
     }
     return [minVal, maxVal, maxVal + Math.abs(minVal)];
   }
