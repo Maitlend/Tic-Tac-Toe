@@ -70,7 +70,7 @@ const playerFactory = (name) => {
 };
 
 // Factory for miniMax vals
-const miniMax = (cell) => {
+const miniMaxVal = (cell) => {
   const index = cell;
   let minVal = 0;
   let maxVal = 0;
@@ -112,7 +112,7 @@ const aiPlayer = (name) => {
     aiDifficulty = difficulty;
   };
 
-  function getMiniMaxVal(board, cell, lanes){
+  function calcMiniMax(board, cell, lanes){
     // Use filter method to find all lanes that intersect current cell.
     const cellLanes = lanes.filter((lane) => lane.includes(cell));
     let minVal = 0;
@@ -197,12 +197,12 @@ const aiPlayer = (name) => {
           }
         }
         // Set miniMaxVal to array containing [minVal,MaxVal, abs(minVal) + maxVal (move payoff)] values.
-        const miniMaxVal = getMiniMaxVal.call(this, board, cell, lanes);
+        const miniMaxEl = calcMiniMax.call(this, board, cell, lanes);
         // Check if maxVal is 10 (winning move).
         if(miniMaxVal[1] === 10){
           return miniMaxVals.length;
         }
-        miniMaxVals.push(miniMaxVal);
+        miniMaxVals.push(miniMaxEl);
       }
       // Cell contains a player move, instead push player's mark to array to keep proper length/indexes.
       else{
