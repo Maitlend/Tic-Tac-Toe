@@ -188,8 +188,7 @@ const aiPlayer = (name) => {
 
   function findBestMove(miniMaxVals){
     // Sort miniMaxVals according to cellVal
-    const sortedVals = miniMaxVals.sort((cell1, cell2) => (cell1.getCellVal() < cell2.getCellVal()) ? 1 : -1);
-    // sortedVals.forEach(cell => console.log(`cell ${cell.getIndex()}, cell value = ${cell.getCellVal()}`));
+    miniMaxVals.sort((cell1, cell2) => (cell1.getCellVal() < cell2.getCellVal()) ? 1 : -1);
 
     let currGroupVal = miniMaxVals[0].getCellVal();
     let currGroup = [];
@@ -213,17 +212,22 @@ const aiPlayer = (name) => {
       }
     }
     groupedVals.push(currGroup);
-    console.log(viewGrouped(groupedVals));
-    let move;
-    if(aiDifficulty === 'unbeatable'){
-      move = 0;
-    } else if(aiDifficulty === 'medium'){
-      move = 1;
-    } else {
-      move = 2;
+    // console.log(viewGrouped(groupedVals));
+    const randomGroup = Math.random();
+    let move = 0;
+    if(groupedVals.length > 1){
+      if(aiDifficulty === 'hard'){
+        if(randomGroup > .90){
+          move = 1;
+        }
+      } else if(aiDifficulty === 'medium'){
+        if(randomGroup > .45){
+          move = 1;
+        }
+      }
     }
-    const random = Math.floor(Math.random() * groupedVals[move].length);
-    return groupedVals[move][random].getIndex();
+    const randomCell = Math.floor(Math.random() * groupedVals[move].length);
+    return groupedVals[move][randomCell].getIndex();
   }
 
   function miniMax(board, lanes) {
@@ -233,7 +237,7 @@ const aiPlayer = (name) => {
     for (let cell = 0; cell < board.length; cell += 1) {
       if (board[cell] === "") {
         // Check edge case lose scenario for unbeatable player.
-        if(cell === 1 && aiDifficulty === "unbeatable"){
+        if(cell === 1 && aiDifficulty !== "medium"){
           if(board[0] === this.getOpponent() && board[8] === this.getOpponent() ||
              board[2] === this.getOpponent() && board[6] === this.getOpponent()){
             return 1;
