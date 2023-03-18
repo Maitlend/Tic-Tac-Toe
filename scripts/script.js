@@ -142,7 +142,7 @@ const aiPlayer = (name) => {
       }        
       // If lane does not contain current players mark, minVal of cell decrements by one.
       // Only enter if minVal has not already been set to -10 by a previous lane check on current cell.
-      if(!boardLaneValues.includes(this.getName()) && cellMiniMax.getMinVal !== -10){
+      if(!boardLaneValues.includes(this.getName()) && cellMiniMax.getMinVal() !== -10){
         cellMiniMax.decMin();
         // If lane also contains opponents mark, minVal of cell decrements by one.
         if(boardLaneValues.includes(this.getOpponent())){
@@ -158,24 +158,72 @@ const aiPlayer = (name) => {
     // Loop through avail cells to prevent a loss if found
     for(let i = 0; i < miniMaxVals.length; i+=1){
       if(miniMaxVals[i].getMinVal() === -10 ){
-        return i;
+        return miniMaxVals[i].getIndex();
       }
     }
     return -1;
   }
 
+  // function viewCurrGroup(array){
+  //   let string = "[";
+  //   for(let i = 0; i < array.length; i+=1){
+  //     string = string.concat(array[i].getIndex(), ", ");
+  //   }
+  //   string = string.concat("]");
+  //   return string;
+  // }
+
+  // function viewGrouped(array){
+  //   let string = "[";
+  //   for(let i = 0; i < array.length; i+=1){
+  //     string = string.concat("[");
+  //     for(let j = 0; j < array[i].length; j+=1){
+  //       string = string.concat(array[i][j].getIndex(), ", ");
+  //     }
+  //     string = string.concat("], ");
+  //   }
+  //   string = string.concat("]");
+  //   return string;
+  // }
+
   function findBestMove(miniMaxVals){
-      let max = -50;
-      let move = -1;
-      for (let i = 0; i < miniMaxVals.length; i+=1) {
-        const moveVal = miniMaxVals[i].getCellVal();
-        // Check if potential move is greater than current move value.
-        if (moveVal > max) {
-          move = miniMaxVals[i].getIndex();
-          max = moveVal;
-        }   
+    // Sort miniMaxVals according to cellVal
+    const sortedVals = miniMaxVals.sort((cell1, cell2) => (cell1.getCellVal() < cell2.getCellVal()) ? 1 : -1);
+    // sortedVals.forEach(cell => console.log(`cell ${cell.getIndex()}, cell value = ${cell.getCellVal()}`));
+
+    let currGroupVal = miniMaxVals[0].getCellVal();
+    let currGroup = [];
+    const groupedVals = [];
+    for(let i = 0; i < miniMaxVals.length; i+=1){
+      const currCell = miniMaxVals[i];
+      // console.log(`Working on cell: ${currCell.getIndex()} with value: ${currCell.getCellVal()}`);
+      // console.log(`currentGroupVal = ${currGroupVal}`);
+      if(currCell.getCellVal() === currGroupVal){
+        // console.log("currentGroupVal = currentCell val");
+        currGroup.push(currCell);
+        // console.log(viewCurrGroup(currGroup));
       }
-      return move;
+      else {
+        // console.log(`currentGroupVal of currCell != ${currGroupVal}`);
+        // console.log(`Pushing ${viewCurrGroup(currGroup)} to grouped vals.`);
+        groupedVals.push(currGroup);
+        // console.log(`groupedVals = ${viewGrouped(groupedVals)}`);
+        currGroupVal = currCell.getCellVal();
+        currGroup = [currCell];
+      }
+    }
+    groupedVals.push(currGroup);
+    console.log(viewGrouped(groupedVals));
+    let move;
+    if(aiDifficulty === 'unbeatable'){
+      move = 0;
+    } else if(aiDifficulty === 'medium'){
+      move = 1;
+    } else {
+      move = 2;
+    }
+    const random = Math.floor(Math.random() * groupedVals[move].length);
+    return groupedVals[move][random].getIndex();
   }
 
   function miniMax(board, lanes) {
@@ -184,8 +232,8 @@ const aiPlayer = (name) => {
     // Loop each board cell to determine min/max value of empty cells (vaid moves).
     for (let cell = 0; cell < board.length; cell += 1) {
       if (board[cell] === "") {
-        // Check edge case lose scenario for player.
-        if(cell === 1){
+        // Check edge case lose scenario for unbeatable player.
+        if(cell === 1 && aiDifficulty === "unbeatable"){
           if(board[0] === this.getOpponent() && board[8] === this.getOpponent() ||
              board[2] === this.getOpponent() && board[6] === this.getOpponent()){
             return 1;
