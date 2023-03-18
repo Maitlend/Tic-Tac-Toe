@@ -12,8 +12,12 @@ const gameboard = (() => {
     [2, 5, 8],
   ];
 
-  function viewGameboard() {
-    // console.log(playerMoves);
+  function getGameboard() {
+    return playerMoves;
+  }
+
+  function getWinConditions(){
+    return winConditions;
   }
 
   function resetPlayerMoves() {
@@ -53,6 +57,27 @@ const gameboard = (() => {
     playerMoves[position] = player.getName();
     return turnResult(player);
   }
+
+  return { resetPlayerMoves, playerMove, getGameboard, getWinConditions};
+})();
+
+// Factory for creating players.
+const playerFactory = (name) => {
+  const getName = () => name;
+  const getOpponent = () => (name === "X" ? "O" : "X");
+
+  return { getName, getOpponent };
+};
+
+// Factory for creating ai players.
+const aiPlayer = (name) => {
+  const getName = () => name;
+  const getOpponent = () => (name === "X" ? "O" : "X");
+  let aiDifficulty;
+
+  function setDifficulty(difficulty) {
+    aiDifficulty = difficulty;
+  };
 
   function getMiniMaxVal(board, cell, lanes, player){
     // Use filter method to find all lanes that intersect current cell.
@@ -162,31 +187,23 @@ const gameboard = (() => {
   }
 
   // Returns a random valid move for ai to make
-  function getEasyMove(){
+  function getEasyMove(board){
     // Mark valid moves in array with index number
-    let openMoves = playerMoves.map((position, index) => position === '' ? index : position);
+    let openMoves = board.map((position, index) => position === '' ? index : position);
     // Filter non valid moves from array
     openMoves = openMoves.filter(position => Number.isInteger(position));
     return openMoves[Math.floor(Math.random() * openMoves.length)];
   }
 
-  function getMove(player, difficulty) {
-    if(difficulty === 'easy'){
-      return getEasyMove();
+  function getMove(player) {
+    const board = gameboard.getGameboard();
+    if(aiDifficulty === 'easy'){
+      return getEasyMove(board);
     }
-    console.log(difficulty);
-    return miniMax(playerMoves, winConditions, player);
+    return miniMax(board, gameboard.getWinConditions(), player);
   }
 
-  return { resetPlayerMoves, playerMove, viewGameboard, getMove };
-})();
-
-// Factory for creating players.
-const playerFactory = (name) => {
-  const getName = () => name;
-  const getOpponent = () => (name === "X" ? "O" : "X");
-
-  return { getName, getOpponent };
+  return { getName, getOpponent, setDifficulty, getMove };
 };
 
 // Module for game.
@@ -197,11 +214,10 @@ const game = (() => {
   const backdrop = document.querySelector(".backdrop");
   const winnerDisplay = document.getElementById("winner-mark");
   const cells = [];
-  const playerO = playerFactory("O");
   const playerX = playerFactory("X");
+  let playerO = playerFactory("O");
   let currentPlayer = playerX;
   let playingComputer = false;
-  let computerDifficulty;
   let gameOver = false;
 
   // Bind dom cells to cells array.
@@ -269,7 +285,7 @@ const game = (() => {
     }
     // If set to play computer and game is not over, have ai make move.
     if(playingComputer && currentPlayer === playerO && gameOver === false){
-      const aiMove = gameboard.getMove(playerO, computerDifficulty);
+      const aiMove = playerO.getMove(playerO);
       cells[aiMove].click();
     }
   }
@@ -293,10 +309,11 @@ const game = (() => {
   function setGameType(){
     const {value} = document.querySelector('#form-drop-down');
     if(value === 'pvp'){
-      computerDifficulty = '';
+      playerO = playerFactory("O");
       playingComputer = false;
     } else {
-      computerDifficulty = value;
+      playerO = aiPlayer("O");
+      playerO.setDifficulty(value);
       playingComputer = true;
     }
     resetGame();
