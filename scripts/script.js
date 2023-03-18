@@ -69,6 +69,39 @@ const playerFactory = (name) => {
   return { getName, getOpponent };
 };
 
+// Factory for miniMax vals
+const miniMax = (cell) => {
+  const index = cell;
+  let minVal = 0;
+  let maxVal = 0;
+  let cellVal = 0;
+
+  const getIndex = () => index;
+  const getMinVal = () => minVal;
+  const getMaxVal = () => maxVal;
+  const getCellVal = () => cellVal;
+
+  function updateCellVal(){
+    cellVal = Math.abs(minVal) + maxVal;
+  }
+  function decMin(){
+    minVal -= 1;
+    updateCellVal()
+  }
+  function incMax(){
+    maxVal += 1;
+    updateCellVal()
+  }
+  function losingCell(){
+    minVal = -10;
+  }
+  function winningCell(){
+    maxVal = 10;
+  }  
+
+  return {getIndex, getMinVal, getMaxVal, getCellVal, decMin, incMax, losingCell, winningCell};
+}
+
 // Factory for creating ai players.
 const aiPlayer = (name) => {
   const getName = () => name;
@@ -87,12 +120,12 @@ const aiPlayer = (name) => {
     // Loop through each lane in our cellLanes array.
     for (let lane = 0; lane < cellLanes.length; lane += 1) {
       const boardLaneValues = board.filter((cell, index) => cellLanes[lane].includes(index));
-      // Check lane for two current player marks (win scenario) break and return immediately.
+      // Check lane for two current player marks (win scenario).
       if ((boardLaneValues[0] === this.getName() && boardLaneValues[0] === boardLaneValues[1]) ||
           (boardLaneValues[1] === this.getName() && boardLaneValues[1] === boardLaneValues[2]) ||
           (boardLaneValues[0] === this.getName() && boardLaneValues[0] === boardLaneValues[2])) {
         maxVal = 10;
-        break;
+        // break;
       }  
       // If lane does not contain opponent mark maxVal of cell increments by one.
       if(!boardLaneValues.includes(this.getOpponent()) && maxVal !== 10){
